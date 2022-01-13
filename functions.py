@@ -4,12 +4,10 @@ import pandas as pd
 import codecs
 import requests
 
-
 def nameLink():
-    nL = input("link or name: ")
-    if nL == 'name':
-        name = filedialog.askopenfilename()
-        file = codecs.open(name, "r", "utf-8")
+    nL = input("link or file: ")
+    if nL == 'file':
+        file = filedialog.askopenfilename()
         return file
         
     if nL == 'link':
@@ -17,16 +15,13 @@ def nameLink():
         content = response.content
         return content
 
-
-def htmlInfos():
-    # content = response.content
-    
+def htmlInfos():    
     type = input('|confer| or |period|: ')
 
-    content = BeautifulSoup(nameLink(), 'html.parser')
+    file = codecs.open(nameLink(), "r", "utf-8")
+    content = BeautifulSoup(file, 'html.parser')
 
     works = content.findAll('tr')
-    year = content.find('h3', attrs={'class': 'year'})
 
     infos = []
     for work in works:
@@ -37,19 +32,21 @@ def htmlInfos():
         td = str(work.select('td')[1])
         authors = td.split(". <b")[0][0:].split("td>")[1][0:]
 
-        if type == 'confer':
-            infos.append([authors, title, confer, year.text, qualis[8:]])
+        if type == 'confer':          
+            year = content.find('h3', attrs={'class': 'year'}).text
+            infos.append([authors, title, confer, year, qualis[8:]]) 
         if type == 'period':
             issn = td.split("issn:")[1][0:].split(",")[0][1:]
-            infos.append([authors, title, confer, issn, year.text, qualis[8:]])
+            year = td.split("issn:")[1][0:].split(",")[1][:].split(".")[0][:]
+            infos.append([authors, title, confer, issn, year, qualis[8:]])
     
-    crtExcel(type, infos, year.text)
-
-    return()
+    crtExcel(type, infos)
     file.close()
 
-def crtExcel(type, infos, year):
+def crtExcel(type, infos):
     if type == 'confer':    table = pd.DataFrame(infos, columns=['Lista de autores', 'Título do artigo', 'Nome da conferência', 'Ano', 'Qualis'])
     if type == 'period':    table = pd.DataFrame(infos, columns=['Lista de autores', 'Título do artigo', 'Nome da conferência', 'ISSN', 'Ano', 'Qualis'])
     
+    year = input('Ano: ')
+
     table.to_excel('PPCIC-{}-{}.xlsx'.format(type, year), index=False)
