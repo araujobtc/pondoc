@@ -98,12 +98,12 @@ def periodData():
     return Period
 
 def lconferData():
-    LConferencias = {}
-    return LConferencias
+    LConfer = {}
+    return LConfer
 
 def lperiodData():
-    LConferencias = {}
-    return LConferencias
+    Lperiod = {}
+    return Lperiod
 
 def tabelasData():
     Tabelas = {
@@ -118,12 +118,12 @@ def tabelasData():
 def producaoData():
     Producao = {}
     #
-    return LConferencias
+    return Producao
 
 def hindexData():
     HIndex = {}
     #
-    return LConferencias
+    return HIndex
 
 def insertData():
 
