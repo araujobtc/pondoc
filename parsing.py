@@ -1,9 +1,22 @@
-from pyparsing import (CharsNotIn, Word, Literal, OneOrMore, alphanums, delimitedList, printables, alphas, nums, oneOf, Or, Combine, ZeroOrMore)
+from pyparsing import (CharsNotIn, 
+                       Word, 
+                       Literal, 
+                       OneOrMore, 
+                       alphanums, 
+                       delimitedList, 
+                       printables, 
+                       alphas,
+                       alphas8bit,
+                       nums,
+                       oneOf,
+                       Or, 
+                       Combine,
+                       ZeroOrMore)
+
 import sys
 
 def makeDecoratingParseAction(marker):
     def parse_action_impl(s,l,t):
-		#
         return (marker, t)
     return parse_action_impl
 
@@ -135,23 +148,36 @@ def parseConferenceRef(citation_str, debug = False):
 
   return result
 
+def normalizerRef(elements):
+    surname = elements[0].lstrip()
+    elements.pop(0)
+    name = (' '.join(elements) + ' ' + surname).upper()
+    return name
+
 def infosCitation(result):
     authors = []
     for element in result.asList():
         if element[0] == 'author':
-            authors.append(element[1].asList())
+            try: authors.append(normalizerRef(element[1]))
+            except: authors.append(normalizerRef(element[1][0][1] + element[1][1][1]))
         elif element[0] == 'title':
             title = element[1].asList()
             title = ' '.join(word for word in title)
         elif element[0] == 'journal':
-            journal = element[1].asList()
-            journal = ' '.join(word for word in journal)
+            conferJournal = element[1].asList()
+            conferJournal = ' '.join(word for word in conferJournal)
+        elif element[0] == 'conference':
+            conferJournal = element[1].asList()
+            conferJournal = ' '.join(word for word in conferJournal)
         elif element[0] == 'year':
             year = element[1][0]
         
-    return authors, title, journal, year
+    return authors, title, conferJournal, year
 
-def parseJournalPublication(citation, c, debug = False):
-    if c==0: result = parseRef(citation, debug = debug)
-    elif c==1: result = parseConferenceRef(citation, debug = debug)
+def parseJournalPublication(citation, debug = False):
+    result = parseRef(citation, debug = debug)
+    return infosCitation(result)
+
+def parseConferencePublication(citation, debug = False):
+    result = parseConferenceRef(citation, debug = debug)
     return infosCitation(result)
