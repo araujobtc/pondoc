@@ -18,7 +18,7 @@
 
 > ## Introdução
 <p>
-    Projeto para estágio obrigatório para a conclusão do curso de Informática na instituição Centro Federal de Educação Tecnológica celso Suckow da Fonseca 
+    Projeto de estágio obrigatório para a conclusão do curso de Informática na instituição Centro Federal de Educação Tecnológica celso Suckow da Fonseca 
     (CEFET-RJ/MARACANÃ), sob a supervisão do professor Eduardo Bezerra da Silva.
     <div align=right> 
         <b>Dúvidas</b> <br>
@@ -55,7 +55,7 @@
 > ## Bibliografia
 
 <ol>
-    <li>BEZERRA, Eduardo. ESU-Isabelle. colab google, 2022. Disponível em: <a href='https://colab.research.google.com/drive/13ycNwltD-z9lZJCqMf_dXs9Fw24R4Acl?usp=sharing'>colab google</a>. Último acesso em: 12/01/2022 e 07/04/2022.</li>
+    <li>BEZERRA, Eduardo. ESU-Isabelle. colab google, 2022. Disponível em: <a href='https://colab.research.google.com/drive/13ycNwltD-z9lZJCqMf_dXs9Fw24R4Acl?usp=sharing'>colab google</a>. Último acesso em: 07/04/2022.</li>
     <li>DISTINGUISH matches in pyparsing. stackoverflow, 2015. Disponível em: <a href='https://stackoverflow.com/questions/29282878/distinguish-matches-in-pyparsing'>stackoverflow</a>. Último acesso em: 12/01/2022.</li>
     <li>GETTING a pure list out of 'pyparsing.ParseResults'. stackoverflow, 2012. Disponível em: <a href='https://stackoverflow.com/questions/10534035/getting-a-pure-list-out-of-pyparsing-parseresults'>stackoverflow</a>. Último acesso em: 12/01/2022.</li>
     <li>MCGUIRE, Paul. Module pyparsing. pythonhosted, 2017. Disponível em: <a href='https://pythonhosted.org/pyparsing/pyparsing-module.html'>pythonhosted</a>. Último acesso em: 07/04/2022.</li>
