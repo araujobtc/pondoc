@@ -38,7 +38,6 @@ with open('PPCICresearchers.json', encoding='utf-8') as fileR:
     for category in researchers:
         for researcher in researchers[category]:
             for citations in researchers[category][researcher]:
-                print(citations)
                 sql = "INSERT INTO researchers (nome_completo, sobrenome, nome, categoria) VALUES ('{}', '{}', '{}', '{}')".format(researcher, citations[0], citations[1], category[6:])
                 db.insert_db(sql)
 
