@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import codecs
-import requests
 
 def htmlInfos(fileName):    
     file = codecs.open(fileName, "r", "utf-8")

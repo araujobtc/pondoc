@@ -1,7 +1,7 @@
 import pandas as pd
 import database as db
-from BSoup import htmlInfos
-from parsing import parseJournalPublication, parseConferencePublication
+from reader import htmlInfos
+from analyzer import parseJournalPublication, parseConferencePublication
 
 def qualisJournal(titleL):
     qualis = pd.DataFrame(db.consult_db("SELECT qualis, nome FROM qualis"))
@@ -47,12 +47,12 @@ def geralData():
 
 def conferData():
     Confer={}
-    authorsL, titleL, journalL, yearL, index, qualisL, qualisAval = refInfos('PPCIC scriptLattes - conferencias.html', 0)
+    authorsL, titleL, conferL, yearL, index, qualisL, qualisAval = refInfos('PPCIC scriptLattes - conferencias.html', 0)
 
     Confer['Ano'] = yearL
     Confer['Numero'] = index
     Confer['Artigo'] = titleL
-    Confer['Fórum'] = journalL
+    Confer['Fórum'] = conferL
     Confer['Discente'] = ['']*len(index)
     Confer['Qualis'] =  qualisL
     Confer['Área'] = ['']*len(index)
@@ -99,6 +99,15 @@ def periodData():
 
 def lconferData():
     LConfer = {}
+
+    authorsL, titleL, conferJournalL, yearL, index, qualisL, qualisAval = refInfos('PPCIC scriptLattes - conferencias.html')
+
+    LConfer[Conferencias] = titleL
+    LConfer[Qualis] = qualisL
+    LConfer[CS] = [0]*len(titleL)
+    LConfer[Restrito] = [0]*len(titleL)
+    LConfer[Value] = qualisAval
+
     return LConfer
 
 def lperiodData():
