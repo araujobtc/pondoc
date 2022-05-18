@@ -61,6 +61,6 @@
 
 > ## Mais informações
 
-[bibliography.md](https://github.com/araujobtc/pondoc/docs/bibliography.md)
+[bibliography.md](https://github.com/araujobtc/pondoc/blob/main/docs/bibliography.md)
 
 <p align="right"><a href="#PONDOC">Topo ↑</a></p>
