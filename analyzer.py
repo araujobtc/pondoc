@@ -21,68 +21,69 @@ def makeDecoratingParseAction(marker):
     return parse_action_impl
 
 def parseRef(citation_str, debug = False):
-  author_name_before_comma = CharsNotIn(',')
-  abbreviated_name = Combine(Word(alphas.upper(), exact=1) + '.')
+    author_name_before_comma = CharsNotIn(',')
+    abbreviated_name = Combine(Word(alphas.upper(), exact=1) + '.')
 
-  unicodePrintables = ''.join(chr(c) for c in range(sys.maxunicode) 
-                                        if not chr(c) in [' ', ';', ',', '.'])
+    unicodePrintables = ''.join(chr(c) for c in range(sys.maxunicode) 
+                                            if not chr(c) in [' ', ';', ',', '.'])
 
-  unicodePrintablesJournal = ''.join(chr(c) for c in range(sys.maxunicode) 
-                                        if not chr(c) in [';', '.'])
+    unicodePrintablesJournal = ''.join(chr(c) for c in range(sys.maxunicode) 
+                                            if not chr(c) in [';', '.'])
 
-  non_abbreviated_name = Word(unicodePrintables)
+    non_abbreviated_name = Word(unicodePrintables)
 
-  name_component = (abbreviated_name | non_abbreviated_name)
-  author_name_after_comma = OneOrMore(name_component)
+    name_component = (abbreviated_name | non_abbreviated_name)
+    author_name_after_comma = OneOrMore(name_component)
 
-  author = (author_name_before_comma("author_name_before_comma") + 
-            Literal(',').suppress() + 
-            author_name_after_comma("author_name_after_comma"))
+    author = (author_name_before_comma("author_name_before_comma") + 
+                Literal(',').suppress() + 
+                author_name_after_comma("author_name_after_comma"))
 
-  author_list = delimitedList(author, delim = ';')
+    author_list = delimitedList(author, delim = ';')
 
-  author.setParseAction(makeDecoratingParseAction("author"))
+    author.setParseAction(makeDecoratingParseAction("author"))
 
-  author_list = (delimitedList(author, delim = ';') + Literal('.').suppress()) 
+    author_list = (delimitedList(author, delim = ';') + Literal('.').suppress()) 
 
-  sentence = (OneOrMore(Word(unicodePrintables, excludeChars='.'), stopOn=Literal('.')))
+    sentence = (OneOrMore(Word(unicodePrintables, excludeChars='.'), stopOn=Literal('.')))
 
-  title = sentence('Title')
-  title = title.setParseAction(makeDecoratingParseAction("title"))
+    title = sentence('Title')
+    title = title.setParseAction(makeDecoratingParseAction("title"))
 
-  sentenceJournal = OneOrMore(Word(unicodePrintablesJournal, excludeChars='.'), stopOn=Literal('.'))
-  journal = sentenceJournal('Journal')
-  journal = journal.setParseAction(makeDecoratingParseAction("journal"))
+    sentenceJournal = OneOrMore(Word(unicodePrintablesJournal, excludeChars='.'), stopOn=Literal('.'))
+    journal = sentenceJournal('Journal')
+    journal = journal.setParseAction(makeDecoratingParseAction("journal"))
 
-  valid_year = Word(nums, exact=4) + Literal('.').suppress()
+    valid_year = Word(nums, exact=4) + Literal('.').suppress()
 
-  year = (valid_year | Literal('0') + Literal('.').suppress())
-  year = year.setParseAction(makeDecoratingParseAction("year"))
+    year = (valid_year | Literal('0') + Literal('.').suppress())
+    year = year.setParseAction(makeDecoratingParseAction("year"))
 
-  remaining_stuff = OneOrMore(Word(printables), stopOn=year)
+    remaining_stuff = OneOrMore(Word(printables), stopOn=year)
+    remaining_stuff = remaining_stuff.setParseAction(makeDecoratingParseAction("Remaining"))
+   
+    if debug:
+        # to track the matching expressions
+        non_abbreviated_name.setName("non_abbreviated_name").setDebug()
+        abbreviated_name.setName("abbreviated_name").setDebug()
+        author.setName("author").setDebug()
+        author_list.setName("author_list").setDebug()
+        sentence.setName("Sentence").setDebug()
+        title.setName("title").setDebug()
+        journal.setName("Journal").setDebug()
+        remaining_stuff.setName("Remaining").setDebug()
+    
+    citation = (author_list('AuthorLst') + 
+                title + 
+                Literal('.') + 
+                journal + 
+                Literal('.') + 
+                remaining_stuff +
+                year)
 
-  if debug:
-    # to track the matching expressions
-    non_abbreviated_name.setName("non_abbreviated_name").setDebug()
-    abbreviated_name.setName("abbreviated_name").setDebug()
-    author.setName("author").setDebug()
-    author_list.setName("author_list").setDebug()
-    sentence.setName("Sentence").setDebug()
-    title.setName("title").setDebug()
-    journal.setName("Journal").setDebug()
-    remaining_stuff.setName("Remaining").setDebug()
-  
-  citation = (author_list('AuthorLst') + 
-              title + 
-              Literal('.') + 
-              journal + 
-              Literal('.') + 
-              remaining_stuff +
-              year)
+    result = citation.parseString(citation_str)
 
-  result = citation.parseString(citation_str)
-
-  return result
+    return result
 
 def parseConferenceRef(citation_str, debug = False):
   author_name_before_comma = CharsNotIn(',')
@@ -148,31 +149,31 @@ def parseConferenceRef(citation_str, debug = False):
 
   return result
 
-def normalizerRef(elements):
-    surname = elements[0].lstrip()
-    elements.pop(0)
-    name = (' '.join(elements) + ' ' + surname).upper()
-    return name
-
 def infosCitation(result):
     authors = []
     for element in result.asList():
         if element[0] == 'author':
-            try: authors.append(normalizerRef(element[1]))
-            except: authors.append(normalizerRef(element[1][0][1] + element[1][1][1]))
+            authors.append(element[1].asList())
         elif element[0] == 'title':
             title = element[1].asList()
             title = ' '.join(word for word in title)
         elif element[0] == 'journal':
-            conferJournal = element[1].asList()
-            conferJournal = ' '.join(word for word in conferJournal)
+            journal = element[1].asList()
+            journal = ' '.join(word for word in journal)
         elif element[0] == 'conference':
-            conferJournal = element[1].asList()
-            conferJournal = ' '.join(word for word in conferJournal)
+            conference = element[1].asList()
+            conference = ' '.join(word for word in conference)
+        elif element[0] == 'Remaining':
+                remaining = element[1].asList()
+                remaining = ' '.join(word for word in remaining)                
+                l = remaining.find('issn: ') + 6
+                issn = remaining[l:l+9]
         elif element[0] == 'year':
             year = element[1][0]
-        
-    return authors, title, conferJournal, year
+
+    try: return authors, title, journal, issn, year
+    except: return authors, title, conference, year
+
 
 def parseJournalPublication(citation, debug = False):
     result = parseRef(citation, debug = debug)
@@ -181,3 +182,4 @@ def parseJournalPublication(citation, debug = False):
 def parseConferencePublication(citation, debug = False):
     result = parseConferenceRef(citation, debug = debug)
     return infosCitation(result)
+    
