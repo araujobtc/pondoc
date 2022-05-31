@@ -149,18 +149,11 @@ def parseConferenceRef(citation_str, debug = False):
 
   return result
 
-def normalizerRef(elements):
-    surname = elements[0].lstrip()
-    elements.pop(0)
-    name = (' '.join(elements) + ' ' + surname).upper()
-    return name
-
 def infosCitation(result):
     authors = []
     for element in result.asList():
         if element[0] == 'author':
-            try: authors.append(normalizerRef(element[1]))
-            except: authors.append(normalizerRef(element[1][0][1] + element[1][1][1]))
+            authors.append(element[1].asList())
         elif element[0] == 'title':
             title = element[1].asList()
             title = ' '.join(word for word in title)
@@ -189,3 +182,4 @@ def parseJournalPublication(citation, debug = False):
 def parseConferencePublication(citation, debug = False):
     result = parseConferenceRef(citation, debug = debug)
     return infosCitation(result)
+    
