@@ -12,11 +12,10 @@ for table in tables:
 
 # Criando a tabelas
 sql = '''CREATE TABLE researchers( 
-        nome_completo       VARCHAR(150), 
-        sobrenome           VARCHAR(75),
-        nome                VARCHAR(75),
+        nome                VARCHAR(255), 
+        referencia          VARCHAR(50),
         categoria           VARCHAR(25),
-        PRIMARY KEY (nome_completo, sobrenome, nome)
+        PRIMARY KEY (nome, referencia, categoria)
         )'''
 
 db.create_db(sql)
@@ -38,8 +37,7 @@ with open('PPCICresearchers.json', encoding='utf-8') as fileR:
     for category in researchers:
         for researcher in researchers[category]:
             for citations in researchers[category][researcher]:
-                print(citations)
-                sql = "INSERT INTO researchers (nome_completo, sobrenome, nome, categoria) VALUES ('{}', '{}', '{}', '{}')".format(researcher, citations[0], citations[1], category[6:])
+                sql = "INSERT INTO researchers (nome, referencia, categoria) VALUES ('{}', '{}', '{}')".format(researcher.upper(), citations.upper(), category[6:].upper())
                 db.insert_db(sql)
 
 # qualis
