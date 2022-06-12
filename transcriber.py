@@ -1,205 +1,143 @@
 import pandas as pd
-import database as db
-from analyzer import parseJournalPublication, parseConferencePublication
-
-
-def qualis(titles):
-    qualisDB = pd.DataFrame(db.consult_db("SELECT qualis, nome FROM qualis"))
-    qualis, nota = [], []
-
-    qualisNota={'A1': 1.000, 'A2': 0.875, 'A3': 0.750, 'A4': 0.625, 'B1': 0.500, 'B2': 0.200,
-        'B3': 0.100, 'B4': 0.050, 'B5': 0.000, 'C': 0.000, 'NA': 0.000, 'NI': 0.000}
-
-    for t in titles:
-        m=0
-        for i in qualisDB[1]:
-            if i == t:
-                qualis.append(qualisDB[0][m])
-                nota.append(qualisNota.get(qualisDB[0][m]))
-            m+=1
-
-    return qualis, nota
-
-def refInfos(infosp, infosc):
-    authorsP, titleP, journals, yearP, indexP = [], [], [], [], []
-
-    i = 1
-
-    for infos in infosp:
-        authors, title, journal, year = parseJournalPublication(infos)
-        authorsP.append(authors)
-        titleP.append(title)
-        journals.append(journal)
-        yearP.append(year)
-        indexP.append(i)
-        i+=1    
-    
-    qualisP, notaP = qualis(titleL)
-    
-    authorsC, titleC, conferences, yearC, indexC= [], [], [], [], []
-    
-    i = 1
-
-    for infos in infosc:
-        authors, title, conference, year = parseConferencePublication(infos)
-        authorsC.append(authors)
-        titleC.append(title)
-        conferences.append(conference)
-        yearC.append(year)
-        indexC.append(i)
-        i+=1
-
-    qualisC, notaC = qualis(titleL)
-
-    return authorsP, titleP, journals, yearP, indexP, qualisP, notaP, authorsC, titleC, conferences, yearC, indexC, qualisC, notaC
+from handler import refInfos, researchersCorrelation
 
 # sheets
-
-def geralData(writer):
+def geralData():
     Geral = {}
+    #
+    return Geral
 
-    geral = pd.DataFrame(Geral, index=None)
-
-    geral.to_excel(writer, sheet_name='Geral')
-
-def conferData(writer, authorsC, titleC, conferences, yearC, indexC, qualisC, notaC):
+def conferData(rCauthorsnorm, discauthorsC, titlec, conferences, yearc, qualisc):
     Confer={}
 
-    Confer['Ano'] = yearC
-    Confer['Numero'] = indexC
-    Confer['Artigo'] = titleC
+    Confer['Ano'] = yearc
+    Confer['Numero'] = range(1, len(titlec)+1)
+    Confer['Artigo'] = titlec
     Confer['Fórum'] = conferences
-    Confer['Discente'] = ['']*len(index)
-    Confer['Qualis'] =  qualisC
-    Confer['Área'] = ['']*len(index)
-    Confer['Restrito'] = ['']*len(index)
-    Confer['Discente Programa'] = ['']*len(index)
+    Confer['Discente'] = discauthorsC
+    Confer['Qualis-site'] = qualisc
+    Confer['Área'] = ['']*len(titlec)
+    Confer['Restrito'] = ['']*len(titlec)
+    Confer['Discente Programa'] = ['']*len(titlec)
 
-    docentes=pd.DataFrame(db.consult_db("SELECT nome_completo FROM researchers"))
-    for n in range(len(docentes)):
-        Confer[docentes[0][n]]=['']*len(index)
+    Confer.update(researchersCorrelation(rCauthorsnorm))
 
+    Confer['Qualis'] = ['-']*len(titlec)
+    Confer['Docentes'] = ['']*len(titlec)
+    Confer['Fator'] = ['']*len(titlec)
+    Confer['Credenciamento'] = ['']*len(titlec)
 
-    Confer['Qualis'] = notaC
-    Confer['Docentes'] = ['']*len(index)
-    Confer['Fator'] = ['']*len(index)
-    Confer['Credenciamento'] = ['']*len(index)
+    return Confer
 
-    confer = pd.DataFrame(Confer, index=None)
-
-    confer.to_excel(writer, sheet_name='Conferencias')
-
-def periodData(writer, authorsP, titleP, journals, yearP, indexP, qualisP, notaP):
+def periodData(rJauthorsnorm, discauthorsJ, titlej, journals, yearj, qualis, nota):
     Period = {}
-
-    Period['Ano'] = yearP
-    Period['Numero'] = indexP
-    Period['Artigo'] = titleP
+    Period['Ano'] = yearj
+    Period['Numero'] = range(1, len(titlej)+1)
+    Period['Artigo'] = titlej
     Period['Fórum'] = journals
-    Period['Discente'] = ['']*len(index)
-    Period['Qualis'] =  qualisP
-    Period['Área'] = ['']*len(index)
-    Period['Restrito'] = ['']*len(index)
-    Period['Discente Programa'] = ['']*len(index)
+    Period['Discente'] = discauthorsJ
+    Period['Qualis-pdf'] =  qualis
+    Period['Área'] = ['']*len(titlej)
+    Period['Restrito'] = ['']*len(titlej)
+    Period['Discente Programa'] = ['']*len(titlej)
 
-    docentes=pd.DataFrame(db.consult_db("SELECT nome_completo FROM researchers"))
-    for n in range(len(docentes)):
-        Period[docentes[0][n]]=[0]*len(index)
+    Period.update(researchersCorrelation(rJauthorsnorm))
 
+    Period['Qualis_'] = nota
+    Period['Docentes'] = ['']*len(titlej)
+    Period['Fator'] = ['']*len(titlej)
+    Period['Credenciamento'] = ['']*len(titlej)
 
-    Period['Qualis'] = notaP
-    Period['Docentes'] = ['']*len(index)
-    Period['Fator'] = ['']*len(index)
-    Period['Credenciamento'] = ['']*len(index)
+    return Period
 
-    period = pd.DataFrame(Period, index=None)
-
-    period.to_excel(writer, sheet_name='Periodicos')
-
-def lconferData(writer, conferences, qualisC, notaC):
+def lconferData(conferences, qualisc):
     LConfer = {}
 
     LConfer['Conferencias'] = conferences
-    LConfer['Qualis'] = qualisC
-    LConfer['CS'] = [0]*len(conferences)
-    LConfer['Restrito'] = [0]*len(conferences)
-    LConfer['Value'] = notaC
+    LConfer['Qualis-site'] = qualisc
+    LConfer['CS'] = ['']*len(conferences)
+    LConfer['Restrito'] = ['']*len(conferences)
+    LConfer['Value'] = ['']*len(conferences)
 
-    lconfer = pd.DataFrame(LConfer, index=None)
+    return LConfer
 
-    lconfer.to_excel(writer, sheet_name='LConferencias')
+def lperiodData(journals, issn, qualisj, qualis, nota):
+    LPeriod = {}
 
-def lperiodData(writer, journals, qualisP, notaP):
-    Lperiod = {}
-
-    LPeriod['Conferencias'] = journals
-    LPeriod['Qualis'] = qualisC
+    LPeriod['Periodicos'] = journals
+    LPeriod['Qualis-site'] = qualisj
     LPeriod['CS'] = [0]*len(journals)
     LPeriod['Restrito'] = [0]*len(journals)
-    LPeriod['Value'] = notaC
-
-    issn=pd.DataFrame(db.consult_db("SELECT issn FROM qualis"))
-    for n in range(len(issn)):
-        LPeriod['ISSN/eISSN']=issn[0][n]
-
+    LPeriod['Value'] = nota
+    LPeriod['ISSN/eISSN']=issn
     LPeriod['JIF (Percentil)'] = [0]*len(journals)
     LPeriod['Scopus'] = [0]*len(journals)
-    LPeriod['Qualis-PDF'] = qualisC
+    LPeriod['Qualis-PDF'] = qualis
     LPeriod['QJIF'] = [0]*len(journals)
     LPeriod['Qscopus'] = [0]*len(journals)
-    LPeriod['Max(PDF:Scopus)'] = notaC
+    LPeriod['Max(PDF:Scopus)'] = nota
 
-    lperiod = pd.DataFrame(LPeriod, index=None)
+    return LPeriod
 
-    lperiod.to_excel(writer, sheet_name='LPeriodicos')
-
-def tabelasData(writer):
+def tabelasData():
     Tabelas = {
         'Qualis': ['A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B3', 'B4', 'B5', 'C', 'NA', 'NI'],
         'Ponto': [1.000, 0.875, 0.750, 0.625, 0.500, 0.200, 0.100, 0.050, 0.000, 0.000, 0.000, 0.000],
         'Restrito': [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
         '': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        '': [1.000, 0.875, 0.750, 0.625, 0.500, 0.200, 0.100, 0.050, 0.000, 0.000, 0.000, 0.000]
     }
     
-    tabelas = pd.DataFrame(Tabelas, index=None)
+    return Tabelas
 
-    tabelas.to_excel(writer, sheet_name='Tabelas')
-
-def producaoData(writer):
+def producaoData():
     Producao = {}
     # 
-    producao = pd.DataFrame(Producao, index=None)
+    return Producao
 
-    producao.to_excel(writer, sheet_name='Producao')
-
-def hindexData(writer):
+def hindexData():
     HIndex = {}
     #
-    hindex = pd.DataFrame(HIndex, index=None)
+    return HIndex
 
-    hindex.to_excel(writer, sheet_name='HIndex')
-
-def insertData(infosp, infosc):
+def insertData(anos, rJauthorsnorm, resultsJournals, discauthorsJ, rCauthorsnorm, resultsConferences, discauthorsC):
     
-    (authorsP, titleP, journals,
-    yearP, indexP, qualisP,
-    notaP, authorsC, titleC,
-    conferences, yearC, indexC,
-    qualisC, notaC) = refInfos(infosp, infosc)
-
-    arq = input('Nome para o arquivo: ')+'.xlsx'
+    arq = str(f'producao{str(anos[0])}-{str(anos[1]-1)}.xlsx')
     writer = pd.ExcelWriter(arq, engine='xlsxwriter')
 
-    # tables
+    g, c, p, lc, lp, t, pr, h = {}, {}, {}, {}, {}, {}, {}, {}
 
-    geralData(writer)
-    conferData(writer, authorsC, titleC, conferences, yearC, indexC, qualisC, notaC)
-    periodData(writer, authorsP, titleP, journals, yearP, indexP, qualisP,  notaP)
-    lconferData(writer, conferences, qualisC, notaC)
-    lperiodData(writer, journals, qualisP, notaP)
-    tabelasData(writer)
-    producaoData(writer)
-    hindexData(writer)
+
+    titlesj, journals, issn, yearj, qualisj, qualis, nota, titlesc, conferences, yearc, qualisc = refInfos(resultsJournals, resultsConferences)
+    print(len(titlesj), len(journals), len(issn), len(yearj), len(qualisj), len(qualis), len(nota))
+
+    # dicts
+    g.update(geralData())
+    c.update(conferData(rCauthorsnorm, discauthorsC, titlesc, conferences, yearc, qualisc))
+    p.update(periodData(rJauthorsnorm, discauthorsJ, titlesj, journals, yearj, qualis, nota))
+    lc.update(lconferData(conferences, qualisc))
+    lp.update(lperiodData(journals, issn, qualisj, qualis, nota))
+    t.update(tabelasData())
+    pr.update(producaoData())
+    h.update(hindexData())
+
+    # tables
+    geral = pd.DataFrame(g, index=None)
+    confer = pd.DataFrame(c, index=None)
+    period = pd.DataFrame(p, index=None)
+    lconfer = pd.DataFrame(lc, index=None)
+    lperiod = pd.DataFrame(lp, index=None)
+    tabelas = pd.DataFrame(t, index=None)
+    producao = pd.DataFrame(pr, index=None)
+    hindex = pd.DataFrame(h, index=None)
+
+    # worksheets
+    geral.to_excel(writer, sheet_name='Geral', index=False)
+    confer.to_excel(writer, sheet_name='Conferencias', index=False)
+    period.to_excel(writer, sheet_name='Periodicos', index=False)
+    lconfer.to_excel(writer, sheet_name='LConferencias', index=False, freeze_panes=(1,1))
+    lperiod.to_excel(writer, sheet_name='LPeriodicos', index=False, freeze_panes=(1,1))
+    tabelas.to_excel(writer, sheet_name='Tabelas', index=False)
+    producao.to_excel(writer, sheet_name='Producao', index=False)
+    hindex.to_excel(writer, sheet_name='HIndex', index=False)
 
     writer.save()
