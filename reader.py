@@ -1,9 +1,8 @@
 from bs4 import BeautifulSoup
-import codecs
 import requests
 
-def htmlInfos(fileName):    
-    file = codecs.open(fileName, "r", "utf-8")
+def htmlInfos(url):
+    file = requests.get(url).content
     content = BeautifulSoup(file, 'html.parser')
 
     works = content.findAll('tr')
@@ -15,5 +14,4 @@ def htmlInfos(fileName):
             if td[char] == '[':
                 infos.append(str(td[:char-11]))
     
-    file.close()
     return infos

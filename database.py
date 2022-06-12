@@ -42,3 +42,4 @@ def consult_db(sql):
         registros.append(rec)
     con.close()
     return registros
+    
