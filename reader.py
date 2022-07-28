@@ -12,6 +12,6 @@ def htmlInfos(url):
         td = work.select('td')[1].text
         for char in range(len(td)):
             if td[char] == '[':
-                infos.append(str(td[:char-11]))
+                infos.append(str(td[:char-11].strip()+ ' ' + td[char+113:].strip() + '.'))
     
     return infos
