@@ -1,77 +1,73 @@
 import pandas as pd
 import database as db
+from fuzzywuzzy import fuzz
 
-# retorna o qualis (A1 ~ NI) e o valor do qualis (1.000 ~ 0.000) de acordo com o titulo ou com o issn pego no site
-def qualisInfos(journals, issn):
-    jis = []
-    for i in range(len(journals)):
-        jis.append([journals[i], issn[i]])
+# retorna o qualis (A1 ~ NI) de acordo com o titulo ou com o issn pego no site
+def qualisInfos(conferjournals, issn = 0):
+    cjis, qualis, color = [], [], []
+    for i in range(len(conferjournals)):
+        cjis.append([conferjournals[i], issn[i]])
 
-    qualisDB = pd.DataFrame(db.consult_db("SELECT * FROM qualis"))
-    qualis, nota = [], []
+    qualisDB = db.consult_db("SELECT * FROM qualis")
 
-    qualisNota={
-        'A1': '1.000', 'A2': '0.875', 'A3': '0.750', 'A4': '0.625', 'B1': '0.500', 'B2': '0.200',
-        'B3': '0.100', 'B4': '0.050', 'B5': '0.000', 'C': '0.000', 'NA': '0.000', 'NI': '0.000'}
-
-    for i in jis:
+    for i in cjis:
         for q in range(len(qualisDB)):
-            m = qualisDB[0][q].upper()
-            p = qualisDB[1][q].replace('"', "'").upper()
-            print(p)
-            n = qualisDB[2][q].upper()
-            if i[1] == m:                                                   #compara ISSNs
-                print(i[1], m)
-                qualis.append(n)
-                nota.append(qualisNota.get(n))
-                break  
-            elif i[0].upper() in p:                                         #compara nomes
-                print(i[0], p)
-                qualis.append(n)
-                nota.append(qualisNota.get(n))
-                break 
-        if len(qualis) < jis.index(i)+1 and len(nota) < jis.index(i)+1:     #caso não haja correspondencia entre nomes ou ISSNs
-            qualis.append('NI')
-            nota.append(qualisNota.get('NI'))
+            issn = qualisDB[q][0]  
+            nome = qualisDB[q][1]
+            qdb = qualisDB[q][2]
+            if fuzz.ratio(i[0], nome) == 100: 
+                color.append(0)
+                qualis.append(qdb)
+                break
+            elif 95 <= fuzz.ratio(i[0], nome):
+                color.append(1)
+                qualis.append(qdb)
+                break
+            elif fuzz.ratio(i[1], issn) == 100:
+                color.append(1)
+                qualis.append(qdb)
+                break
+            
+        if len(qualis) < cjis.index(i)+1:
+            color.append(1) 
+            qualis.append('NI')  
 
-    return qualis, nota
+    return qualis, color
 
 # separa as informações em lista para cada tipo
 def refInfos(resultsJournals, resultsConferences):
-    titlesj, journals, issn, yearj, qualisj, titlesc, conferences, yearc, qualisc = [], [], [], [], [], [], [], [], []
+    titlesj, journals, issn, yearj, qualisurlj, titlesc, conferences, yearc, qualisurlc = [], [], [], [], [], [], [], [], []
 
     for i in resultsJournals:
         titlesj.append(i[1])
         journals.append(i[2])
         issn.append(i[3])
         yearj.append(i[4])
-        if 'NÃO IDENTIFICADO' in i[5].upper(): qualisj.append('NI')
-        else: qualisj.append(i[5][:2])
+        if 'NÃO IDENTIFICADO' in i[5].upper(): qualisurlj.append('NI')
+        else: qualisurlj.append(i[5][:2])
     
-    qualis, nota = qualisInfos(journals, issn)
+    qualisj, colorj = qualisInfos(journals, issn)
        
     for i in resultsConferences:
         titlesc.append(i[1])
         conferences.append(i[2])
         yearc.append(i[3])
-        if 'NÃO IDENTIFICADO' in i[4].upper(): qualisc.append('NI')
-        else: qualisc.append(i[4][:2])
+        if 'NÃO IDENTIFICADO' in i[4].upper(): qualisurlc.append('NI')
+        else: qualisurlc.append(i[4][:2])
 
-    return titlesj, journals, issn, yearj, qualisj, qualis, nota, titlesc, conferences, yearc, qualisc
+    # qualisc, colorc = qualisInfos(conferences)
 
-# cria dicionário para a correlação dos docentes e projetos
-def dictResearchers():
+    return titlesj, journals, issn, yearj, qualisj, colorj, titlesc, conferences, yearc, qualisurlc #qualisurlj, qualisc, colorc
+
+# insere no dicionário a correlação dos docentes e projetos
+def researchersCorrelation(list):
     rc = {}
     docentes=pd.DataFrame(db.consult_db("SELECT nome FROM researchers"))
     for i in docentes[0]:
         rc[i]=[]
-    return rc
 
-# insere no dicionário a correlação dos docentes e projetos
-def researchersCorrelation(list):
-    rc = dictResearchers()
-    for i in list:
-        for r in rc:
+    for r in rc:
+        for i in list:
             if r in i: rc[r].append(1)
-            elif r not in i: rc[r].append(0)
+            elif r not in i: rc[r].append('')
     return rc
