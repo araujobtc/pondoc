@@ -3,14 +3,14 @@ import psycopg2
 # Função para criar conexão no banco
 def conect_db():
     db = psycopg2.connect(host='localhost', 
-                        database='infosProducao',
+                        dbname='infosProducao',
                         user='postgres', 
                         password='postgres',
                         port='5432')
     return db
 
-  # Função para criar tabela no banco
-def create_db(sql):
+  # Função para criar ou dropar uma tabela no banco
+def create_drop_db(sql):
     con = conect_db()
     cur = con.cursor()
     cur.execute(sql)
@@ -18,7 +18,7 @@ def create_db(sql):
     con.close()
     
 # Função para inserir dados no banco
-def insert_db(sql):
+def insert_delete_db(sql):
     con = conect_db()
     cur = con.cursor()
     try:
