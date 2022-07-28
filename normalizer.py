@@ -12,14 +12,14 @@ def normalizer(l):
         for ref in docentes[0]:
             if nameref == ref:
                 sql = f"SELECT nome FROM researchers WHERE referencia = '{ref}'"
-                fullname = pd.DataFrame(db.consult_db(sql))[0][0]
+                fullname = db.consult_db(sql)[0][0]
                 doc.append(fullname)
 
         discentes=pd.DataFrame(db.consult_db("SELECT referencia FROM students"))
         for ref in discentes[0]:
             if nameref == ref:
                 sql = f"SELECT nome FROM students WHERE referencia = '{ref}'"
-                fullname = pd.DataFrame(db.consult_db(sql))[0][0]
+                fullname = db.consult_db(sql)[0][0]
                 dis.append(fullname)
               
-    return doc, dis
+    return doc, ''.join(dis)
