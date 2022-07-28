@@ -1,143 +1,85 @@
+import openpyxl
+from openpyxl.styles import Font
 import pandas as pd
 from handler import refInfos, researchersCorrelation
 
-# sheets
-def geralData():
-    Geral = {}
-    #
-    return Geral
+def conferData(wb, discauthorsC, titlesc, conferences, yearc):
+    for i in range(2, len(titlesc)+2):
+        wb[f'A{i}']= yearc[i-2]
+        wb[f'B{i}']= i-1
+        wb[f'C{i}']= titlesc[i-2]
+        wb[f'D{i}']= conferences[i-2]
+        # if colorc[i-2] == 1: wb[f'D{i}'].font = Font(color='FF0000')
+        if discauthorsC[i-2] != []: wb[f'E{i}']= discauthorsC[i-2]
+        wb[f'F{i}']= f'=VLOOKUP(D{i},LConferencias!A:B,2,FALSE)'
+        wb[f'G{i}']= f'=VLOOKUP(D{i},LConferencias!A:C,3,FALSE)'
+        wb[f'H{i}']= f'=VLOOKUP(D{i},LConferencias!A:D,4,FALSE)'
+        wb[f'I{i}']= f'=IF(E{i}<>"",1,0)'
+        wb[f'AB{i}']= f'=VLOOKUP(F{i},Tabelas!A:C,2,FALSE)'
+        wb[f'AC{i}']= f'=SUM(K{i}:Z{i})'
+        wb[f'AD{i}']= f'=IF(AC{i}<=2,1,1-LOG(AC{i}-1))'
+        wb[f'AE{i}']= f'=VLOOKUP(D{i},LConferencias!A:E,5,FALSE)*IF(I{i}>0,1.1,1)*AD{i}'
 
-def conferData(rCauthorsnorm, discauthorsC, titlec, conferences, yearc, qualisc):
-    Confer={}
+def periodData(wb, discauthorsJ, titlesj, journals, yearj, colorj):
+    for i in range(2, len(titlesj)+2):
+        wb[f'A{i}']= yearj[i-2]
+        wb[f'B{i}']= i-1
+        wb[f'C{i}']= titlesj[i-2]
+        wb[f'D{i}']= journals[i-2]
+        if colorj[i-2] == 1: wb[f'D{i}'].font = Font(color='FF0000')
+        if discauthorsJ[i-2] != []: wb[f'E{i}']= discauthorsJ[i-2]
+        wb[f'F{i}']= f'=VLOOKUP(D{i},LPeriodicos!A:B,2,FALSE)'
+        wb[f'G{i}']= f'=VLOOKUP(D{i},LPeriodicos!A:C,3,FALSE)'
+        wb[f'H{i}']= f'=VLOOKUP(D{i},LPeriodicos!A:D,4,FALSE)'
+        wb[f'I{i}']= f'=IF(E{i}<>"",1,0)'
+        wb[f'AB{i}']= f'=VLOOKUP(F{i},Tabelas!A:C,2,FALSE)'
+        wb[f'AC{i}']= f'=SUM(K{i}:Z{i})'
+        wb[f'AD{i}']= f'=IF(AC{i}<=2,1,1-LOG(AC{i}-1))'
+        wb[f'AE{i}']= f'=VLOOKUP(D{i},LPeriodicos!A:E,5,FALSE)*IF(I{i}>0,1.1,1)*AD{i}'
 
-    Confer['Ano'] = yearc
-    Confer['Numero'] = range(1, len(titlec)+1)
-    Confer['Artigo'] = titlec
-    Confer['Fórum'] = conferences
-    Confer['Discente'] = discauthorsC
-    Confer['Qualis-site'] = qualisc
-    Confer['Área'] = ['']*len(titlec)
-    Confer['Restrito'] = ['']*len(titlec)
-    Confer['Discente Programa'] = ['']*len(titlec)
+def lconferData(wb, conferences, qualisurlc):
+    for i in range(2, len(conferences)+2):
+        wb[f'A{i}']= conferences[i-2]
+        # if colorc[i-2] == 1: wb[f'A{i}'].font = Font(color='FF0000')
+        wb[f'B{i}']= qualisurlc[i-2]
+        wb[f'C{i}']= f'=IF(B{i}<>"NI",1,0)'
+        wb[f'D{i}']= f'=VLOOKUP(B{i},Tabelas!A:C,3,FALSE)'
+        wb[f'E{i}']= f'=VLOOKUP(B{i},Tabelas!A:C,2,FALSE)'
 
-    Confer.update(researchersCorrelation(rCauthorsnorm))
+def lperiodData(wb, journals, issn, qualisj, colorj):
+    for i in range(2, len(journals)+2):
+        wb[f'A{i}']= journals[i-2]
+        if colorj[i-2] == 1: wb[f'A{i}'].font = Font(color='FF0000')
+        wb[f'B{i}']= f'=IF(M{i}>1-1/8,"A1",IF(M{i}>1-2/8,"A2",IF(M{i}>1-3/8,"A3",IF(M{i}>1/2,"A4",IF(M{i}>1-5/8,"B1",IF(M{i}>=0.2,"B2",IF(M{i}>=0.1,"B3",IF(M{i}>=0.05,"B4","NA"))))))))'
+        wb[f'D{i}']= f'=VLOOKUP(B{i},Tabelas!A:C,3,FALSE)'
+        wb[f'E{i}']= f'=VLOOKUP(B{i},Tabelas!A:C,2,FALSE)'
+        wb[f'G{i}']= issn[i-2]
+        wb[f'J{i}']= qualisj[i-2]
+        wb[f'K{i}']= f'=IF(H{i}>1-1/8,"A1",IF(H{i}>1-2/8,"A2",IF(H{i}>1-3/8,"A3",IF(H{i}>1/2,"A4",IF(H{i}>1-5/8,"B1",IF(H{i}>1-6/8,"B2",IF(H{i}>1-7/8,"B3",IF(H{i}>0,"B4","NA"))))))))'
+        wb[f'L{i}']= f'=IF(I{i}>1-1/8,"A1",IF(I{i}>1-2/8,"A2",IF(I{i}>1-3/8,"A3",IF(I{i}>1/2,"A4",IF(I{i}>1-5/8,"B1",IF(I{i}>1-6/8,"B2",IF(I{i}>1-7/8,"B3",IF(I{i}>0,"B4","NA"))))))))'
+        wb[f'M{i}']= f'=MAX(VLOOKUP(L{i},Tabelas!A:C,2,FALSE),VLOOKUP(J{i},Tabelas!A:C,2,FALSE),VLOOKUP(J{i},Tabelas!A:C,2,FALSE))'
 
-    Confer['Qualis'] = ['-']*len(titlec)
-    Confer['Docentes'] = ['']*len(titlec)
-    Confer['Fator'] = ['']*len(titlec)
-    Confer['Credenciamento'] = ['']*len(titlec)
+def insertData(period, file, rJauthorsnorm, resultsJournals, discauthorsJ, rCauthorsnorm, resultsConferences, discauthorsC):
+    wb = openpyxl.load_workbook(filename = file)
+    titlesj, journals, issn, yearj, qualisj, colorj, titlesc, conferences, yearc, qualisurlc = refInfos(resultsJournals, resultsConferences) #qualisurlj, qualisc, colorc
 
-    return Confer
+    wb['Conferencias'].delete_rows(2, 150)
+    wb['Periodicos'].delete_rows(2, 150)
+    wb['LConferencias'].delete_rows(2, 200)
+    wb['LPeriodicos'].delete_rows(2, 200)
 
-def periodData(rJauthorsnorm, discauthorsJ, titlej, journals, yearj, qualis, nota):
-    Period = {}
-    Period['Ano'] = yearj
-    Period['Numero'] = range(1, len(titlej)+1)
-    Period['Artigo'] = titlej
-    Period['Fórum'] = journals
-    Period['Discente'] = discauthorsJ
-    Period['Qualis-pdf'] =  qualis
-    Period['Área'] = ['']*len(titlej)
-    Period['Restrito'] = ['']*len(titlej)
-    Period['Discente Programa'] = ['']*len(titlej)
-
-    Period.update(researchersCorrelation(rJauthorsnorm))
-
-    Period['Qualis_'] = nota
-    Period['Docentes'] = ['']*len(titlej)
-    Period['Fator'] = ['']*len(titlej)
-    Period['Credenciamento'] = ['']*len(titlej)
-
-    return Period
-
-def lconferData(conferences, qualisc):
-    LConfer = {}
-
-    LConfer['Conferencias'] = conferences
-    LConfer['Qualis-site'] = qualisc
-    LConfer['CS'] = ['']*len(conferences)
-    LConfer['Restrito'] = ['']*len(conferences)
-    LConfer['Value'] = ['']*len(conferences)
-
-    return LConfer
-
-def lperiodData(journals, issn, qualisj, qualis, nota):
-    LPeriod = {}
-
-    LPeriod['Periodicos'] = journals
-    LPeriod['Qualis-site'] = qualisj
-    LPeriod['CS'] = [0]*len(journals)
-    LPeriod['Restrito'] = [0]*len(journals)
-    LPeriod['Value'] = nota
-    LPeriod['ISSN/eISSN']=issn
-    LPeriod['JIF (Percentil)'] = [0]*len(journals)
-    LPeriod['Scopus'] = [0]*len(journals)
-    LPeriod['Qualis-PDF'] = qualis
-    LPeriod['QJIF'] = [0]*len(journals)
-    LPeriod['Qscopus'] = [0]*len(journals)
-    LPeriod['Max(PDF:Scopus)'] = nota
-
-    return LPeriod
-
-def tabelasData():
-    Tabelas = {
-        'Qualis': ['A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B3', 'B4', 'B5', 'C', 'NA', 'NI'],
-        'Ponto': [1.000, 0.875, 0.750, 0.625, 0.500, 0.200, 0.100, 0.050, 0.000, 0.000, 0.000, 0.000],
-        'Restrito': [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        '': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    }
+    conferData(wb['Conferencias'], discauthorsC, titlesc, conferences, yearc)    #colorc
+    periodData(wb['Periodicos'], discauthorsJ, titlesj, journals, yearj, colorj)
+    lconferData(wb['LConferencias'], conferences, qualisurlc)       #qualisurlc -> qualisc, colorc
+    lperiodData(wb['LPeriodicos'], journals, issn, qualisj, colorj)
     
-    return Tabelas
-
-def producaoData():
-    Producao = {}
-    # 
-    return Producao
-
-def hindexData():
-    HIndex = {}
-    #
-    return HIndex
-
-def insertData(anos, rJauthorsnorm, resultsJournals, discauthorsJ, rCauthorsnorm, resultsConferences, discauthorsC):
+    if file == 'default.xlsx': 
+        file = f'producao{"-".join(period)}.xlsx'
+        wb.save(file)
+    else: wb.save(file)
+    wb.close()
     
-    arq = str(f'producao{str(anos[0])}-{str(anos[1]-1)}.xlsx')
-    writer = pd.ExcelWriter(arq, engine='xlsxwriter')
-
-    g, c, p, lc, lp, t, pr, h = {}, {}, {}, {}, {}, {}, {}, {}
-
-
-    titlesj, journals, issn, yearj, qualisj, qualis, nota, titlesc, conferences, yearc, qualisc = refInfos(resultsJournals, resultsConferences)
-    print(len(titlesj), len(journals), len(issn), len(yearj), len(qualisj), len(qualis), len(nota))
-
-    # dicts
-    g.update(geralData())
-    c.update(conferData(rCauthorsnorm, discauthorsC, titlesc, conferences, yearc, qualisc))
-    p.update(periodData(rJauthorsnorm, discauthorsJ, titlesj, journals, yearj, qualis, nota))
-    lc.update(lconferData(conferences, qualisc))
-    lp.update(lperiodData(journals, issn, qualisj, qualis, nota))
-    t.update(tabelasData())
-    pr.update(producaoData())
-    h.update(hindexData())
-
-    # tables
-    geral = pd.DataFrame(g, index=None)
-    confer = pd.DataFrame(c, index=None)
-    period = pd.DataFrame(p, index=None)
-    lconfer = pd.DataFrame(lc, index=None)
-    lperiod = pd.DataFrame(lp, index=None)
-    tabelas = pd.DataFrame(t, index=None)
-    producao = pd.DataFrame(pr, index=None)
-    hindex = pd.DataFrame(h, index=None)
-
-    # worksheets
-    geral.to_excel(writer, sheet_name='Geral', index=False)
-    confer.to_excel(writer, sheet_name='Conferencias', index=False)
-    period.to_excel(writer, sheet_name='Periodicos', index=False)
-    lconfer.to_excel(writer, sheet_name='LConferencias', index=False, freeze_panes=(1,1))
-    lperiod.to_excel(writer, sheet_name='LPeriodicos', index=False, freeze_panes=(1,1))
-    tabelas.to_excel(writer, sheet_name='Tabelas', index=False)
-    producao.to_excel(writer, sheet_name='Producao', index=False)
-    hindex.to_excel(writer, sheet_name='HIndex', index=False)
-
-    writer.save()
+    with pd.ExcelWriter(file, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:   
+        pd.DataFrame(researchersCorrelation(rCauthorsnorm)).to_excel(writer, sheet_name='Conferencias', startrow=1, startcol=10, index=False, header=False)
+        pd.DataFrame(researchersCorrelation(rJauthorsnorm)).to_excel(writer, sheet_name='Periodicos', startrow=1, startcol=10,  index=False, header=False)
+        writer.save()
