@@ -3,7 +3,7 @@ import database as db
 from fuzzywuzzy import fuzz
 
 # retorna o qualis (A1 ~ NI) de acordo com o titulo ou com o issn pego no site
-def qualisInfos(conferjournals, issn = 0):
+def qualisInfos(conferjournals, issn = ''):
     cjis, qualis, color = [], [], []
     for i in range(len(conferjournals)):
         cjis.append([conferjournals[i], issn[i]])
@@ -41,11 +41,17 @@ def refInfos(resultsJournals, resultsConferences):
     for i in resultsJournals:
         titlesj.append(i[1])
         journals.append(i[2])
-        issn.append(i[3])
-        yearj.append(i[4])
-        if 'NÃO IDENTIFICADO' in i[5].upper(): qualisurlj.append('NI')
-        else: qualisurlj.append(i[5][:2])
-    
+        try:
+            if 'NÃO IDENTIFICADO' in i[5].upper(): qualisurlj.append('NI')
+            else: qualisurlj.append(i[5][:2])
+            issn.append(i[3])
+            yearj.append(i[4])
+        except: 
+            yearj.append(i[3])
+            issn.append('')
+            if 'NÃO IDENTIFICADO' in i[4].upper(): qualisurlj.append('NI')
+            else: qualisurlj.append(i[4][:2])
+
     qualisj, colorj = qualisInfos(journals, issn)
        
     for i in resultsConferences:
