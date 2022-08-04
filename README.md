@@ -88,11 +88,13 @@
 
         git clone https://github.com/araujobtc/pondoc.git
 * Banco de dados
+<br><div align=center><img width=400 src='https://user-images.githubusercontent.com/60933617/182953618-a2c8ac85-fdb4-4cf3-8bb5-b12ef55f2723.png'/></div>
 <br>É necessário que o uso se inicie rodando os arquivos scriptsdb.py que criará toda a estrutura dentro do banco de dados escolhido. Porém antes disso serão               necessárias alterações na função conect_db no arquivo database.py, onde deverão ser inseridas informações para acessar o banco de dados desejado.
 
-   * Estrutura
-<div align=center><img width=280 src='https://user-images.githubusercontent.com/60933617/182953708-aae118da-0355-403c-a214-6e8649ae6b2d.png'/><br><br>
-    <img width=400 src='https://user-images.githubusercontent.com/60933617/182953618-a2c8ac85-fdb4-4cf3-8bb5-b12ef55f2723.png'/></div>
+<div align=center>
+    <img width=245 src='https://user-images.githubusercontent.com/60933617/182961611-c9083d05-5221-4540-9408-dc569f9b4510.png'/>
+    <img width=320 src='https://user-images.githubusercontent.com/60933617/182953708-aae118da-0355-403c-a214-6e8649ae6b2d.png'/><br>
+</div>
 
 <p align="right"><a href="#PONDOC">Topo ↑</a></p>
 
