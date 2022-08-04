@@ -12,11 +12,9 @@
 * [Construído com](#Construído-com)
 * [Pré-requisitos](#Pré-requisitos)
 * [Instalação](#Instalação)
-* [Uso](#Uso)
 * [Mais informações](#Mais-informações)
 
 <br>
-
 
 
 > ## Introdução
@@ -34,16 +32,15 @@
 <p align="right"><a href="#PONDOC">Topo ↑</a></p>
 
 
-
 > ## Sobre
 
 <p>
     A partir de produções bibliográficas dos docentes do Programa de Pós-graduação em Ciência da Computação (PPCIC) do CEFET-RJ, o projeto gera um relatório em
     excel para analise de potuação destes docentes, dando importância a avaliação Qualis das conferências e das revistas de publicação.
 </p>
+<div align=center><img width=550 src='https://user-images.githubusercontent.com/60933617/182955105-f64f7bf6-9f0d-4fc9-a08a-a4ee542190e7.png'/></div>
 
 <p align="right"><a href="#PONDOC">Topo ↑</a></p>
-
 
 
 > ## Construído com
@@ -82,22 +79,29 @@
 9. Requests
 
         pip install requests
+        
+<p align="right"><a href="#PONDOC">Topo ↑</a></p>
 
 > ## Instalação
 
 * Clone o repositório
 
         git clone https://github.com/araujobtc/pondoc.git
+* Banco de dados
+<br>É necessário que o uso se inicie rodando os arquivos scriptsdb.py que criará toda a estrutura dentro do banco de dados escolhido. Porém antes disso serão               necessárias alterações na função conect_db no arquivo database.py, onde deverão ser inseridas informações para acessar o banco de dados desejado.
 
-> ## Uso
+   * Estrutura
+<div align=center><img width=280 src='https://user-images.githubusercontent.com/60933617/182953708-aae118da-0355-403c-a214-6e8649ae6b2d.png'/><br><br>
+    <img width=400 src='https://user-images.githubusercontent.com/60933617/182953618-a2c8ac85-fdb4-4cf3-8bb5-b12ef55f2723.png'/></div>
 
+<p align="right"><a href="#PONDOC">Topo ↑</a></p>
 
 > ## Mais informações
 
 ### Licença
 Distributed under the Apache License. See [`LICENSE.txt`](https://github.com/araujobtc/pondoc/BLOB/main/LICENSE) for more information.
 
-### Docs
-[bibliography.md](https://github.com/araujobtc/pondoc/blob/main/docs/bibliography.md)
+### Relatório
+Documentação do projeto PONDOC em [`Relatório`](#a)
 
 <p align="right"><a href="#PONDOC">Topo ↑</a></p>
