@@ -104,6 +104,6 @@
 Distributed under the Apache License. See [`LICENSE.txt`](https://github.com/araujobtc/pondoc/BLOB/main/LICENSE) for more information.
 
 ### Relatório
-Documentação do projeto PONDOC em [`RelatórioEstágio.pdf`](#https://github.com/araujobtc/pondoc/BLOB/main/RelatórioEstágio)
+Documentação do projeto PONDOC em [`RelatórioEstágio.docx`](#https://github.com/araujobtc/pondoc/blob/main/docs/RelatórioEstágio.docx)
 
 <p align="right"><a href="#PONDOC">Topo ↑</a></p>
