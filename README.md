@@ -1,7 +1,7 @@
 <div align=center>
     <img width=200 src='https://user-images.githubusercontent.com/60933617/166180801-b6f8fc4f-37ab-4039-ab40-237cb094f56d.png'/>
     <h1>PONDOC</h1>
-    <b>Estágio obrigatório</b>
+    <b>Estágio</b>
 </div>
 
 <br>
@@ -19,7 +19,7 @@
 
 > ## Introdução
 <p>
-    Projeto de estágio obrigatório para a conclusão do curso de Informática na instituição Centro Federal de Educação Tecnológica celso Suckow da Fonseca 
+    Projeto de estágio para a conclusão do curso de Informática na instituição Centro Federal de Educação Tecnológica celso Suckow da Fonseca 
     (CEFET-RJ/MARACANÃ), sob a supervisão do professor Eduardo Bezerra da Silva.
     <div align=right> 
         <b>Dúvidas</b> <br>
